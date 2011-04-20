@@ -1,5 +1,6 @@
 function [t,y] = resolver_HH(tfinal)
 
+
 %% Parametros
 global C
 global g_K g_Na g_L
@@ -8,6 +9,7 @@ global E_K E_Na E_L
 % global V_m k_m V_max_m sigma_m C_amp_m C_base_m
 % global V_h k_h V_max_h sigma_h C_amp_h C_base_h
 % global I
+global I_inyectada
 
 % Potencial de Nernst (trasladados, para que el
 % voltaje de reposo sea el nulo):
@@ -22,14 +24,14 @@ g_L = 0.3;
 
 % Capacitancia
 C = 1;
-I = 1;
+
 %% Resolucion de la ecuacion diferencial
 tspan = [0 tfinal];
 % Condiciones iniciales
 % y = [V,n,m,h]
 y0 = [0,0,0,0];
 options = odeset('RelTol',1e-9,'AbsTol',[1e-8 1e-5 1e-5 1e-5]);
-[t, y] = ode45(@HH,tspan,y0,options);
+[t, y] = ode23s(@HH,tspan,y0,options);
 
 % Corrientes
 V = y(:,1);
@@ -38,10 +40,15 @@ m = y(:,3);
 h = y(:,4);
 I_K = g_K.*n.^4.*(V-E_K);
 I_Na = g_Na.*m.^3.*h.*(V-E_Na);
+I_inyectada = 10*(1+square((t-10)/(2*pi),20)); % generacion de onda cuadrada
+% I_inyectada = awgn(I_inyectada,1);
 
 %% Figuras
 figure(1)
 plot(t,y(:,1),'k')
+hold on
+plot(t,I_inyectada,'b')
+hold off
 xlabel('tiempo')
 ylabel('voltaje')
 title('potencial de membrana V_{m}')
@@ -60,9 +67,10 @@ figure(3)
 plot(t,I_K,'g')
 hold on
 plot(t,I_Na,'r')
+plot(t,I_inyectada,'k')
 hold off
 xlabel('tiempo')
-legend('I_K','I_{Na}')
+legend('I_K','I_{Na}','I_{inyectada}')
 
 %% Funcion con las ecuaciones diferenciales
 function dydt = HH(t,y)
@@ -105,6 +113,9 @@ function dydt = HH(t,y)
 % C_base_h = 1.2;
 
 % Corrientes
+I = 10*(1+square((t-10)/(2*pi),10)); % generacion de onda cuadrada
+% I = awgn(I,10);
+% de ciclo de trabajo duty/100
 I_K = g_K*n^4*(V-E_K);
 I_Na = g_Na*m^3*h*(V-E_Na);
 I_L = g_L*(V-E_L);

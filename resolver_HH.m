@@ -51,7 +51,7 @@ plot(t,I_inyectada,'b')
 hold off
 xlabel('tiempo')
 ylabel('voltaje')
-title('potencial de membrana V_{m}')
+title('potencial de m   embrana V_{m}')
 
 figure(2)
 plot(t,y(:,2),'g')

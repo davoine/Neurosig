@@ -1,6 +1,5 @@
 function [t,y] = resolver_HH(tfinal)
 
-
 %% Parametros
 global C
 global g_K g_Na g_L
@@ -30,8 +29,9 @@ tspan = [0 tfinal];
 % Condiciones iniciales
 % y = [V,n,m,h]
 y0 = [0,0,0,0];
-options = odeset('RelTol',1e-9,'AbsTol',[1e-8 1e-5 1e-5 1e-5]);
-[t, y] = ode23s(@HH,tspan,y0,options);
+% options = odeset('RelTol',1e-9,'AbsTol',[1e-8 1e-5 1e-5 1e-5]);
+% [t, y] = ode23s(@HH,tspan,y0,options);
+[t, y] = ode23s(@HH,tspan,y0);
 
 % Corrientes
 V = y(:,1);
@@ -40,7 +40,7 @@ m = y(:,3);
 h = y(:,4);
 I_K = g_K.*n.^4.*(V-E_K);
 I_Na = g_Na.*m.^3.*h.*(V-E_Na);
-I_inyectada = 10*(1+square((t-10)/(2*pi),20)); % generacion de onda cuadrada
+I_inyectada = 10*(1+square((t-7)/(2*pi),70)); % generacion de onda cuadrada
 % I_inyectada = awgn(I_inyectada,1);
 
 %% Figuras
@@ -49,9 +49,8 @@ plot(t,y(:,1),'k')
 hold on
 plot(t,I_inyectada,'b')
 hold off
-xlabel('tiempo')
-ylabel('voltaje')
-title('potencial de m   embrana V_{m}')
+xlabel('tiempo (ms)')
+legend('potencial de membrana V_{m} (mV)','corriente inyectada I (pA?)')
 
 figure(2)
 plot(t,y(:,2),'g')
@@ -113,7 +112,8 @@ function dydt = HH(t,y)
 % C_base_h = 1.2;
 
 % Corrientes
-I = 10*(1+square((t-10)/(2*pi),10)); % generacion de onda cuadrada
+I = 10*(1+square((t-7)/(2*pi),70)); % generacion de onda cuadrada
+
 % I = awgn(I,10);
 % de ciclo de trabajo duty/100
 I_K = g_K*n^4*(V-E_K);

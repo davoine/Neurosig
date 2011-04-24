@@ -6,7 +6,8 @@ global g_K g_Na_t g_Na_p g_L
 global E_K E_Na E_L
 global I
 
-% Potencial de Nernst
+% Potencial de Nernst (trasladados, para que el
+% voltaje de reposo sea el nulo):
 E_K = -92;
 E_Na = 55;
 E_L = -60;
@@ -24,7 +25,7 @@ C = 1;
 tspan = [0 tfinal];
 % Condiciones iniciales
 % y = [V,n,m,h]
-y0 = [-60,0,0,0];
+y0 = [0,0,0,0];
 options = odeset('RelTol',1e-9,'AbsTol',[1e-8 1e-5 1e-5 1e-5]);
 [t, y] = ode45(@modeloWuetal2005,tspan,y0,options);
 
@@ -45,9 +46,8 @@ tau_h_p = 1e3 + 1e4./(1+exp((V+60)/10));
 I_K = g_K.*n.^4.*(V-E_K);
 I_Na_t = g_Na_t*m_t_inf.*h_t.*(V-E_Na);
 I_Na_p = g_Na_p*m_p_inf.*h_p.*(V-E_Na);
+I = 20*(1+square(t/(2*pi),20));
 
-% I = 20*(1+square(t/(2*pi),20));
-I =20*(1+chirp(t,0,tfinal,100));
 %% Figuras
 figure(1)
 plot(t,y(:,1),'k')
@@ -91,25 +91,9 @@ h_p = y(4);
 
 %% Parametros
 
-
-% Potencial de Nernst
-E_K = -92;
-E_Na = 55;
-E_L = -60;
-
-% Conductancias maximas
-g_K = 6;
-g_Na_t = 12;
-g_Na_p = 1.1;
-g_L = 2;
-
-% Capacitancia
-C = 1;
-
-
 % Curvas de activacion e inactivacion
 tau_n = 4;
-n_inf = 1/(1+exp(-(V+43)/3.9)); % Nota: esta es la misma expresion que usan en Liu2008 para la corriente sensitiva a 4-AP
+n_inf = 1/(1+exp(-(V+43)/3.9));
 
 m_t_inf = 1/(1+exp(-(V+31.3)/4.3));
 h_t_inf = 1/(1+exp((V+55)/7.1));
@@ -126,8 +110,7 @@ I_Na_p = g_Na_p*m_p_inf*h_p*(V-E_Na);
 I_L = g_L*(V-E_L);
 
 % I = 20*(1+square(t/(2*pi),20));
-I =80*(1+chirp(t,0,tfinal,100));
-
+I =chirp(t,0,tgina,f1)
 %% Ecuaciones diferenciales
 dydt(1) = (1/C)*(I-I_K-I_Na_t-I_Na_p-I_L);
 dydt(2) = (n_inf-n)/tau_n;

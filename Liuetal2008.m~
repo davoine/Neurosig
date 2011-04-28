@@ -166,7 +166,7 @@ I_h = g_h*s*(V-E_h);
 
 % Intensidad en nA
 % I = 100*(1+square((t-10)/(2*pi),20));
-I = -0.1;
+I = 1;
 % I =20*(1+chirp(t,0,tfinal,100));
 
 %% Ecuaciones diferenciales

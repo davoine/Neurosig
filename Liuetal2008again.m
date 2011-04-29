@@ -1,8 +1,14 @@
-tfinal = 500;
+clear all
+close all
+clc
+
+tfinal = 1500;
 tspan = [0 tfinal];
 % y = [V, n_DRK, n_4AP, h_t, s]
-y0 = [-60 0 0 0 0];
-[t, y] = ode45(@modeloLiuetal2008, tspan, y0);
+y0 = [-65.5 0 0 0 0];
+options = odeset('MaxStep',1e-3,'RelTol',1e-5,'AbsTol',[1e-9 1e-3 1e-3 1e-3 1e-3]);
+[t, y] = ode45(@modeloLiuetal2008, tspan, y0, options);
+% [t, y] = ode45(@modeloLiuetal2008, tspan, y0);
 
 % Variables de estado
 V = y(:,1);
@@ -10,7 +16,11 @@ n_DRK = y(:,2);
 n_4AP = y(:,3);
 h_T = y(:,4);
 s = y(:,5);
-
+% 
+% tumb = 100;
+% I = 100*stepfun(t,tumb).*sin((t-tumb).^3);
+% I = 2/10*(t-tumb).*stepfun(t,tumb);
+% I = 900/100*stepfun(t,tumb);
 %% Parametros
 
 % Potencial de Nernst (en mV)
@@ -50,10 +60,11 @@ I_h = g_h*s.*(V-E_h);
 figure(1)
 plot(t,y(:,1),'k')
 hold on
-% plot(t,I_inyectada,'b')
+% plot(t,I,'b')
 hold off
+axis tight
 xlabel('tiempo (ms)')
-% legend('potencial de membrana V_{m} (mV)','corriente inyectada I (nA)')
+% legend('potencial de membrana V_{m} (mV)','corriente inyectada (%100) (pA)')
 
 figure(2)   
 plot(t,y(:,2),'g')
@@ -62,8 +73,9 @@ plot(t,y(:,3),'r')
 plot(t,y(:,4),'b')
 plot(t,y(:,5),'k')
 hold off
-xlabel('tiempo')
-ylabel('porcentaje')
+axis tight
+xlabel('tiempo (ms)')
+ylabel('porcentaje (%)')
 legend('n_{DRK}','n_{4-AP}','h_T','s')
 
 figure(3)
@@ -74,6 +86,8 @@ plot(t,I_NaP,'b')
 plot(t,I_4AP,'k.')
 plot(t,I_DRK,'k*')
 plot(t,I_h,'k-')
+axis tight
 hold off
-xlabel('tiempo')
+xlabel('tiempo (ms)')
+ylabel('corriente (pA)')
 legend('I_L','I_{NaT}','I_{NaP}','I_{4-AP}','I_{DRK}','I_{h}')
